@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <OutputPath>bin\Debug</OutputPath>
+    <ModName>PathPatch</ModName>
+    <UserDir>$(HOMEDRIVE)$(HOMEPATH)</UserDir>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <MyStationeersDir>$(UserDir)\Documents\My Games\Stationeers\</MyStationeersDir>
+    <ModOutputPath>$(MyStationeersDir)mods\$(ModName)\</ModOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)$(ModName).VS.props" />
+  <ItemGroup>
+    <GameReference Include="Assembly-CSharp" />
+    <GameReference Include="UnityEngine" />
+    <GameReference Include="UnityEngine.CoreModule" />
+    <GameReference Include="0Harmony" />
+    <GameReference Include="BepInEx" />
+
+    <_GameRefCandidate Include="@(GameReference->'$(StationeersDirectory)\rocketstation_Data\Managed\%(Identity).dll')" />
+    <_GameRefCandidate Include="@(GameReference->'$(StationeersDirectory)\BepInEx\core\%(Identity).dll')" />
+    <_GameRefResolved Include="@(_GameRefCandidate->Exists())" Path="%(FullPath)" />
+
+    <Reference Include="@(_GameRefResolved->'%(FileName)')" HintPath="%(Path)" Private="False" />
+
+    <_MissingRef Include="@(GameReference)" Exclude="@(Reference)" />
+  </ItemGroup>
+  <Target Name="ValidateGameRefs" BeforeTargets="Build" Condition="'@(_MissingRef)' != ''">
+    <Error Text="Failed to resolve GameReference %(_MissingRef.Identity)" />
+  </Target>
+  <ItemDefinitionGroup>
+    <ModFile>
+      <DestFolder></DestFolder>
+    </ModFile>
+  </ItemDefinitionGroup>
+  <Target Name="CopyToMods" AfterTargets="Build">
+    <ItemGroup>
+      <ModFile Include="$(ProjectDir)\GameData\**\*.*" DestFolder="GameData\%(RecursiveDir)" />
+      <ModFile Include="$(ProjectDir)\About\**\*.*" DestFolder="About\%(RecursiveDir)" />
+      <ModFile Include="$(OutputPath)\$(ModName).dll" />
+      <ModFile Include="$(OutputPath)\$(ModName).pdb" Condition=" '$(Configuration)' == 'Debug' " />
+
+      <_ModFiles Include="@(ModFile)">
+        <Dest>$(ModOutputPath)%(DestFolder)%(FileName)%(Extension)</Dest>
+        <PrettySrc>$([System.String]::Copy('%(FullPath)').Replace('$(ProjectDir)', ''))</PrettySrc>
+        <PrettyDest>$([System.String]::Copy('%(_ModFiles.Dest)').Replace('$(MyStationeersDir)', ''))</PrettyDest>
+      </_ModFiles>
+    </ItemGroup>
+    <RemoveDir Directories="$(ModOutputPath)" />
+    <Message Text="%(_ModFiles.PrettySrc) -> %(_ModFiles.PrettyDest)" Importance="high" />
+    <Copy SourceFiles="%(_ModFiles.FullPath)" DestinationFiles="%(_ModFiles.Dest)" />
+  </Target>
+</Project>
