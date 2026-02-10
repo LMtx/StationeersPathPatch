@@ -2,14 +2,14 @@
 <ModMetadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name>Path Patch</Name>
   <Author>tom_is_unlucky</Author>
-  <Version>0.1.0</Version>
+  <Version>0.1.1</Version>
   <Description>[h1]Path Patch[/h1]
     Catches errors with deleting the temp folder used for loading saves.
   </Description>
   <ChangeLog>
-    [h3]Version 0.1.0:[/h3]
+    [h3]Version 0.1.1:[/h3]
     [list]
-    [*]Initial release
+    [*]Fix error in beta due to ConsoleWindow.Print signature change
     [/list]
   </ChangeLog>
   <Tags>
