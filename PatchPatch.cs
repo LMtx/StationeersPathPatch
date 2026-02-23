@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace PathPatch
 {
-  [BepInPlugin("pathpatch", "Path Patch", "0.1.1")]
+  [BepInPlugin("pathpatch", "Path Patch", "0.1.2")]
   class PathPatchMod : BaseUnityPlugin
   {
     public static ConfigEntry<bool> LogToConsole;
@@ -62,7 +62,7 @@ namespace PathPatch
     {
       Debug.Log($"Ignoring delete error: {ex.Message}\n{ex.StackTrace}");
       if (PathPatchMod.LogToConsole.Value)
-        ConsoleWindow.PrintAction($"{ex.Message}\n{ex.StackTrace}");
+        ConsoleWindow.Print($"{ex.Message}\n{ex.StackTrace}", ConsoleColor.Red, true, true);
     }
 
     static void TryDelete(string path, bool recurse)
